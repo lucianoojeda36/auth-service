@@ -20,6 +20,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 PORT = os.getenv('SERVICE_PORT', '8000')  # Valor por defecto es 8000
+HOST = os.getenv('HOST', '127.0.0.1') 
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -35,7 +36,7 @@ SECRET_KEY = "django-insecure-jaovcc9*v_!j8c@1_gs3tdpnlj7hg&)c45ji19&tgl%wja*a$9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [HOST, 'localhost', '127.0.0.1']
 
 # Application definition
 
