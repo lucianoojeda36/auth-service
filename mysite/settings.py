@@ -25,8 +25,8 @@ print(os.getenv('HOST'))
 
 from django.core.management.commands.runserver import Command as runserver
 # Obtener el host y puerto desde las variables de entorno
-default_host = os.getenv('DJANGO_HOST', '127.0.0.1')
-default_port = os.getenv('DJANGO_PORT', '4000')
+default_host = os.getenv('HOST', '127.0.0.1')
+default_port = os.getenv('SERVICE_PORT', '4000')
 
 # Cambiar el host y el puerto por defecto del servidor de desarrollo
 runserver.default_addr = default_host
