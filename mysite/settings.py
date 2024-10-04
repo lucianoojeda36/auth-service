@@ -21,18 +21,7 @@ load_dotenv()
 
 PORT = os.getenv('SERVICE_PORT', '8000')  # Valor por defecto es 8000
 HOST = os.getenv('HOST', '127.0.0.1') 
-print(os.getenv('HOST'))
 
-from django.core.management.commands.runserver import Command as runserver
-# Obtener el host y puerto desde las variables de entorno
-default_host = os.getenv('HOST', '127.0.0.1')
-default_port = os.getenv('SERVICE_PORT', '4000')
-
-# Cambiar el host y el puerto por defecto del servidor de desarrollo
-runserver.default_addr = default_host
-runserver.default_port = default_port
-
-print(f"Running server at http://{default_host}:{default_port}")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
