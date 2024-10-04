@@ -1,24 +1,27 @@
-# Use the official Python image as a base
+# Usa la imagen oficial de Python como base
 FROM python:3.9
 
-# Set environment variables
+# Evita que Python cree archivos .pyc y habilita la salida sin búfer
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Set the working directory inside the container
+# Establece el directorio de trabajo dentro del contenedor
 WORKDIR /usr/src/app
 
-# Copy the requirements file
+# Copia el archivo de requerimientos
 COPY requirements.txt .
 
-# Install dependencies
+# Instala las dependencias
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of your application files
+# Copia el resto de los archivos de la aplicación
 COPY . .
 
-# Expose the port that the Django app runs on
+# Ejecuta el comando collectstatic sin interacción si usas archivos estáticos
+RUN python manage.py collectstatic --noinput
+
+# Expone el puerto donde corre la aplicación Django
 EXPOSE 8000
 
-# Command to run the Django app
+# Comando para ejecutar la aplicación Django
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

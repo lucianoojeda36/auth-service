@@ -21,7 +21,7 @@ load_dotenv()
 
 PORT = os.getenv('SERVICE_PORT', '8000')  # Valor por defecto es 8000
 HOST = os.getenv('HOST', '127.0.0.1') 
-
+print(os.getenv('HOST'))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -124,7 +124,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = "static/"
+
+STATIC_URL = '/static/'  # Asegúrate de que esto esté definido también
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # O cualquier otro directorio que desees
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),  # Carpeta donde guardas tus archivos estáticos en desarrollo
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
