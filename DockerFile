@@ -12,7 +12,8 @@ WORKDIR /usr/src/app
 COPY requirements.txt .
 
 # Instala las dependencias
-RUN pip install --no-cache-dir -r requirements.txt
+RUN apt-get update && apt-get install -y gcc libpq-dev && apt-get clean && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Copia el resto de los archivos de la aplicación
 COPY . .
@@ -23,5 +24,5 @@ RUN python manage.py collectstatic --noinput
 # Expone el puerto donde corre la aplicación Django
 EXPOSE 8000
 
-# Comando para ejecutar la aplicación Django
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Comando para ejecutar las migraciones y luego la aplicación Django
+CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
