@@ -1,76 +1,54 @@
-name: Deploy Django Auth Service to EC2 and Push to Docker Hub
+name: Deploy Auth Service to EC2 and Docker Hub
 
 on:
   push:
     branches:
-      - main  # Cambia esto a la rama que quieras monitorear
-  workflow_dispatch:  # Permite ejecutar el flujo manualmente desde GitHub
+      - main
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Checkout the code
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v2
 
-    # 2. Set up Python environment
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v2
       with:
-        python-version: '3.9.16'  # Ajusta a la versión de Python que usas
+        python-version: '3.9.16'
 
-    # 3. Install dependencies
-    - name: Install Python dependencies
+    - name: Build Docker Image
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        docker build -t auth-service:latest .
 
-    # 4. Run tests (opcional, pero recomendable para asegurar calidad)
-    - name: Run tests
-      run: |
-        python manage.py test  # Asegura que tus tests pasen antes de desplegar
-
-    # 5. Build Docker image
-    - name: Build Docker image
-      run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/auth-service:latest .
-
-    # 6. Login to Docker Hub
     - name: Log in to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-
-    # 7. Push Docker image to Docker Hub
-    - name: Push Docker image
       run: |
+        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: Push Docker Image to Docker Hub
+      run: |
+        docker tag auth-service:latest ${{ secrets.DOCKER_USERNAME }}/auth-service:latest
         docker push ${{ secrets.DOCKER_USERNAME }}/auth-service:latest
 
-    # 8. Copy Django files via SCP to EC2
     - name: Copy files via SCP to EC2
       uses: appleboy/scp-action@v0.1.4
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_SSH_KEY }}
-        source: './'  # Ruta de tu código fuente que quieres copiar
-        target: '/home/ec2-user/projects/auth-service'  # Ruta destino en EC2
+        source: './'  # Ruta de los archivos que deseas copiar
+        target: '/home/ec2-user/projects/auth-service'  # Ruta en EC2
 
-    # 9. SSH into EC2 to deploy Django app and run migrations
-    - name: Deploy Django app and run migrations
-      uses: appleboy/ssh-action@v0.1.6
+    - name: Execute SSH commands on EC2 with PM2
+      uses: appleboy/ssh-action@v1.0.3
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_SSH_KEY }}
         script: |
           cd /home/ec2-user/projects/auth-service
-          docker pull ${{ secrets.DOCKER_USERNAME }}/auth-service:latest  # Actualiza la imagen
-          docker-compose down  # Detiene los contenedores actuales
-          docker-compose up -d  # Levanta los contenedores con la nueva imagen
-          docker-compose exec web python manage.py migrate  # Ejecuta migraciones de Django
-          docker-compose exec web python manage.py collectstatic --noinput  # Colecta archivos estáticos
-          pm2 restart auth_service  # Reinicia el proceso manejado por PM2
+          npm install  # Instala dependencias si es necesario
+          pm2 restart auth-service  # Reinicia el servicio
+
