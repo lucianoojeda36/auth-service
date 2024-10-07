@@ -50,5 +50,5 @@ jobs:
         script: |
           cd /home/ec2-user/projects/auth-service
           npm install  # Instala dependencias si es necesario
-          pm2 restart auth-service  # Reinicia el servicio
+          pm2 restart auth_service  # Reinicia el servicio
 
