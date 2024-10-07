@@ -18,8 +18,11 @@ RUN apt-get update && apt-get install -y gcc libpq-dev && apt-get clean && \
 # Copia el resto de los archivos de la aplicación
 COPY . .
 
+# Crea el directorio para archivos estáticos
+RUN mkdir -p staticfiles
+
 # Ejecuta el comando collectstatic sin interacción si usas archivos estáticos
-RUN python manage.py collectstatic --noinput
+RUN python manage.py collectstatic  # Ejecuta esto primero sin --noinput para ver errores
 
 # Expone el puerto donde corre la aplicación Django
 EXPOSE 8000
