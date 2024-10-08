@@ -7,4 +7,4 @@ source ./venv/bin/activate
 export $(grep -v '^#' ./.env | xargs)
 
 # Iniciar el servidor Django
-exec python manage.py runserver $HOST:$PORT
+exec python3 manage.py runserver $HOST:$PORT
